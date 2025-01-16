@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { error } from "console";
+import { send } from "process";
 
 const App = () => {
   type Post = {
@@ -8,6 +11,8 @@ const App = () => {
   };
 
   const [data, setData] = useState<Post[]>([]);
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
 
   useEffect(() => {
     console.log(import.meta.env.VITE_API_URL);
@@ -28,6 +33,30 @@ const App = () => {
     }
   };
 
+  const handleSendPost = () => {
+    console.log(title);
+    console.log(body);
+    const newPost = {
+      id: data.length + 1,
+      title: title,
+      body: body,
+    };
+
+    axios
+      .post(`${import.meta.env.VITE_API_URL}posts/`, newPost)
+      .then((response) => {
+        setData([...data, response.data]);
+      })
+      .catch((error) =>
+        console.error(
+          "Error creating post: ",
+          error.response?.data || error.message
+        )
+      );
+    setTitle("");
+    setBody("");
+  };
+
   return (
     <div className="bg-zinc-800 w-full h-screen flex justify-center items-center flex-col gap-5">
       {data.length > 0 &&
@@ -45,8 +74,24 @@ const App = () => {
             </div>
           </div>
         ))}
-      <input className="rounded-full h-10 w-52"></input>
-      <button className="bg-white px-4 py-1 rounded-xl">Submit</button>
+      <input
+        className="rounded-full h-10 w-52 px-3"
+        placeholder="title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      ></input>
+      <input
+        className="rounded-full h-10 w-52 px-3"
+        placeholder="body"
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+      ></input>
+      <button
+        className="bg-white px-4 py-1 rounded-xl"
+        onClick={handleSendPost}
+      >
+        Send Post
+      </button>
     </div>
   );
 };
