@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 
 const App = () => {
-  const [data, setData] = useState([]);
+  type Post = {
+    id: number;
+    title: string;
+    body: string;
+  };
+
+  const [data, setData] = useState<Post[]>([]);
 
   useEffect(() => {
     console.log(import.meta.env.VITE_API_URL);
@@ -14,7 +20,7 @@ const App = () => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-      const result = await response.json();
+      const result: Post[] = await response.json();
       console.log(result);
       setData(result);
     } catch (error) {
@@ -23,8 +29,24 @@ const App = () => {
   };
 
   return (
-    <div className="bg-zinc-800 w-full h-screen flex justify-center items-center">
-      <p className="font-bold text-4xl text-white">{data[0].id}</p>
+    <div className="bg-zinc-800 w-full h-screen flex justify-center items-center flex-col gap-5">
+      {data.length > 0 &&
+        data.map((post) => (
+          <div
+            className="text-center flex flex-col justify-center items-center"
+            key={post.id}
+          >
+            <h1 key={post.id} className="text-white text-2xl text-center">
+              {post.title}
+            </h1>
+            <div className="flex flex-col">
+              <p className="text-white text-base text-center">{post.id}</p>
+              <p className="text-white text-base text-center">{post.body}</p>
+            </div>
+          </div>
+        ))}
+      <input className="rounded-full h-10 w-52"></input>
+      <button className="bg-white px-4 py-1 rounded-xl">Submit</button>
     </div>
   );
 };
